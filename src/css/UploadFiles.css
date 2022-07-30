@@ -1,0 +1,8 @@
+.upload_files{
+    display: flex;
+    justify-content: center;
+}
+
+.upload_files_content{
+    width: 400px;
+}
