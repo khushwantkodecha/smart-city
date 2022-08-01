@@ -1,0 +1,28 @@
+.landing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login_container {
+    border: 1px solid rgba(0, 0, 0, 0.0625);
+    background-color: #fff;
+    padding: 2em;
+    border-radius: 4px;
+}
+
+.landing_content {
+    width: 450px;
+}
+
+/* input[type=text],
+input[type=password],
+input[type=email] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+} */
+

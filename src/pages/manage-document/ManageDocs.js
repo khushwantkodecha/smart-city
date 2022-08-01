@@ -2,12 +2,13 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import Loader from "../components/Loader";
+import Loader from "../../components/loader/Loader";
 import { BsEye } from "react-icons/bs";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
+import { Button, Typography } from "@mui/material";
 
 const style = {
   position: "absolute",
@@ -59,32 +60,16 @@ function ManageDocs() {
         })
         .catch((err) => {
           setLoading(false);
-          console.log(err);
+          notify("Something went wrong while fetching docs!");
         });
     }
-  }, []);
-  console.log("selDoc", selDoc);
-  const fileUploadView = () => {
-    return (
-      <div class="mb-3">
-        <label for="formFile" class="form-label">
-          Default file input example
-        </label>
-        <input class="form-control" type="file" id="formFile" />
-      </div>
-    );
-  };
+  }, [navigate]);
 
   return (
     <>
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <h3>Manage Document</h3>
-        <button
-          className="btn btn-primary btn-sm"
-          onClick={() => navigate("/upload-docs")}
-        >
-          Upload New
-        </button>
+      <div className="d-flex align-items-center justify-content-between mb-5">
+        <Typography variant="h5">Manage Document</Typography>
+        <Button onClick={() => navigate("/upload-docs")}>Upload New</Button>
       </div>
       <div className="manage_docs">
         <ToastContainer />
@@ -92,7 +77,7 @@ function ManageDocs() {
           {loading ? (
             <Loader />
           ) : docs.length > 0 ? (
-            <table class="table table-hover">
+            <table className="table table-hover">
               <thead className="text-center">
                 <tr>
                   <th>#</th>
@@ -146,7 +131,7 @@ function ManageDocs() {
         >
           <Fade in={open}>
             <Box sx={style}>
-              <img width={335} src={selDoc?.document} />
+              <img width={335} src={selDoc?.document} alt="view doc img" />
             </Box>
           </Fade>
         </Modal>

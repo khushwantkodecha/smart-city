@@ -1,9 +1,10 @@
 import axios from "axios";
 import React, { useState } from "react";
-import "../css/UploadFiles.css";
+import "../../assets/css/UploadFiles.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import Loader from "./Loader";
+import Loader from "../../components/loader/Loader";
+import { Typography } from "@mui/material";
 
 function UploadFiles() {
   const [selectedFile, setSelectedFile] = React.useState(null);
@@ -37,7 +38,6 @@ function UploadFiles() {
     const formData = new FormData();
     formData.append("selectedFile", selectedFile);
     formData.append("name", selectedFile);
-    console.log("formdata comin", selectedFile, baseCode);
 
     const payload = {
       name: selectedFile.name,
@@ -48,7 +48,6 @@ function UploadFiles() {
       userId: JSON.parse(localStorage.getItem("user"))?.userId,
     };
 
-    console.log("pay", payload);
     axios({
       method: "post",
       url: "https://pssk-api.azurewebsites.net/Document/Upload",
@@ -64,7 +63,6 @@ function UploadFiles() {
       .catch((err) => {
         setLoading(false);
         notify("Something went wrong!");
-        console.log(err);
       });
   };
 
@@ -76,16 +74,16 @@ function UploadFiles() {
     reader.onload = handleReaderLoad;
     reader.readAsDataURL(file);
     function handleReaderLoad(e) {
-      console.log("running handleReaderLoad()", e);
       filePayload = e.target.result;
-      console.log("filePayload", filePayload);
       setBaseCode(filePayload);
     }
     setSelectedFile(el.target.files[0]);
   };
   return (
     <>
-      <h3 className="mb-3">Upload Document</h3>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        Upload Document
+      </Typography>
       <ToastContainer />
       {loading ? (
         <Loader />
@@ -104,7 +102,7 @@ function UploadFiles() {
                 {/* <input type="file"  /> */}
                 <div>
                   <input
-                    class="form-control"
+                    className="form-control"
                     type="file"
                     onChange={(e) => handleFileSelect(e)}
                   />

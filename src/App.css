@@ -1,7 +1,7 @@
 .app {
     display: flex;
     height: 100vh;
-    overflow: hidden;
+    overflow-y: hidden;
 }
 
 .loggedin_header {
@@ -65,6 +65,7 @@
 
 .sidebar ul {
     margin-top: 1em;
+    height: 100%;
 }
 
 .sidebar ul li {
@@ -73,4 +74,9 @@
     cursor: pointer;
     /* border-bottom: 1px solid rgba(0, 0, 0, 0.0625); */
 
+}
+
+.signout_link{
+    position: absolute;
+    bottom: 0;
 }

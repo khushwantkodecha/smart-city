@@ -1,34 +1,46 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import "./App.css";
-import Login from "./pages/Login";
+import Login from "./pages/auth/Login";
 import axios from "axios";
 
 // pages import
-import ManageProfile from "./pages/ManageProfile";
+import ManageProfile from "./pages/manage-profile/ManageProfile";
 import Protected from "./routes/Protected";
-import ManageDocs from "./pages/ManageDocs";
-import UploadFiles from "./components/UploadFiles";
+import ManageDocs from "./pages/manage-document/ManageDocs";
+import UploadFiles from "./pages/manage-document/UploadFiles";
 
 import MenuIcon from "@mui/icons-material/Menu";
-import DigitalKey from "./pages/DigitalKey";
+import DigitalKey from "./pages/digital-key/DigitalKey";
+import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
+
+import MenuItems from "./menu-items/MenuItems";
+import { Button } from "@mui/material";
 
 const App = () => {
+  const user = localStorage.getItem("user");
   const [isLoggedIn, setisLoggedIn] = useState(true);
   const [sideOpen, setSideOpen] = useState(true);
 
   const signoutHandler = () => {
     const href = window.location.origin;
-    console.log("href", href);
     axios
       .get("https://pssk-api.azurewebsites.net/Authentication/Logout")
       .then((res) => {
+        localStorage.clear();
+        setisLoggedIn(false);
         var new_URL = res.data.toString();
-        new_URL = new_URL.replace("{RedirectUrl}", `${href}`);
-        console.log("new_URL", new_URL);
+        new_URL = new_URL.replace("{RedirectUrl}", "http://localhost:3000");
         window.location = new_URL;
       });
   };
+
+  const userName = JSON.parse(localStorage.getItem("user"))
+    ? JSON.parse(localStorage.getItem("user")).name
+    : "";
+
+  console.log("userName", userName);
 
   return (
     <div className="app">
@@ -38,6 +50,7 @@ const App = () => {
             <div className="logo_container">
               <img
                 className="logo_img"
+                alt="Org Logo"
                 width={50}
                 height={50}
                 src="https://cdn-images-1.medium.com/max/1200/1*1NkKwu_B8cRc-vjE-Ovc9A.png"
@@ -45,46 +58,27 @@ const App = () => {
               <h4>Publicis Sapient</h4>
             </div>
             <ul>
-              <NavLink
-                to={"/Homepage"}
-                style={({ isActive }) =>
-                  isActive
-                    ? {
-                        color: "blue",
-                        textDecoration: "none",
-                      }
-                    : { color: "#000", textDecoration: "none" }
-                }
-              >
-                <li>Manage Profile</li>
-              </NavLink>
-
-              <NavLink
-                to={"/manage-docs"}
-                style={({ isActive }) =>
-                  isActive
-                    ? {
-                        color: "blue",
-                        textDecoration: "none",
-                      }
-                    : { color: "#000", textDecoration: "none" }
-                }
-              >
-                <li>Manage Document</li>
-              </NavLink>
-              <NavLink
-                to={"/digital-key"}
-                style={({ isActive }) =>
-                  isActive
-                    ? {
-                        color: "blue",
-                        textDecoration: "none",
-                      }
-                    : { color: "#000", textDecoration: "none" }
-                }
-              >
-                <li>Digital Key</li>
-              </NavLink>
+              {MenuItems.map((item) => (
+                <NavLink
+                  key={item.id}
+                  to={`${item.url}`}
+                  style={({ isActive }) =>
+                    isActive
+                      ? {
+                          color: "blue",
+                          textDecoration: "none",
+                        }
+                      : { color: "#000", textDecoration: "none" }
+                  }
+                >
+                  <li>{item.title}</li>
+                </NavLink>
+              ))}
+              {isLoggedIn ? (
+                <li className="signout_link">
+                  <Button onClick={signoutHandler}>Sign Out</Button>
+                </li>
+              ) : null}
             </ul>
           </div>
         ) : null}
@@ -101,6 +95,7 @@ const App = () => {
               <div className="logo_container">
                 <img
                   className="logo_img"
+                  alt="Org Logo"
                   width={50}
                   height={50}
                   src="https://cdn-images-1.medium.com/max/1200/1*1NkKwu_B8cRc-vjE-Ovc9A.png"
@@ -115,13 +110,13 @@ const App = () => {
             )}
 
             {isLoggedIn ? (
-              <button className="auth_btn" onClick={signoutHandler}>
-                Sign Out
-              </button>
+              <Stack direction="row" spacing={2}>
+                <Avatar sx={{ mr: 3 }}>{userName?.charAt(0)}</Avatar>
+              </Stack>
             ) : (
-              <button className="auth_btn" to="/">
+              <Button sx={{ pr: 2 }} to="/">
                 Sign In
-              </button>
+              </Button>
             )}
           </div>
           <div className="main_content">
@@ -131,7 +126,7 @@ const App = () => {
                 path="/Homepage"
                 element={
                   <Protected isLoggedIn={isLoggedIn}>
-                    <ManageProfile />
+                    <ManageProfile setisLoggedIn={setisLoggedIn} />
                   </Protected>
                 }
               />

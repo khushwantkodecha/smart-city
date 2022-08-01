@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import Loader from "../components/Loader";
+import Loader from "../../components/loader/Loader";
 import { ToastContainer, toast } from "react-toastify";
 
 function DigitalKey() {
@@ -19,19 +19,21 @@ function DigitalKey() {
     });
 
   useEffect(() => {
-    const userId = JSON.parse(localStorage.getItem("user"))?.userId;
+    const email = JSON.parse(localStorage.getItem("user"))?.email;
     setLoading(true);
     axios
-      .get(`https://pssk-api.azurewebsites.net/User/${userId}/QRCode`)
+      .get(`https://pssk-api.azurewebsites.net/User/${email}/QRCode`)
       .then((res) => {
         setLoading(false);
         setQrData(res.data);
       })
       .catch((err) => {
-        console.log(err);
         notify("Something went wrong!");
       });
+    // setQrData(JSON.parse(localStorage.getItem("user"))?.qrCode);
   }, []);
+
+  const imageUrl = qrData ? `data:image/png;base64,${qrData}` : null;
 
   return (
     <>
@@ -42,10 +44,7 @@ function DigitalKey() {
       ) : (
         <div className="digitalkey w-100">
           <div className="digitalkey_content d-flex flex-column align-items-center">
-            <img
-              width={500}
-              src="https://media-cldnry.s-nbcnews.com/image/upload/t_social_share_1024x768_scale,f_auto,q_auto:best/MSNBC/Components/Photo/_new/110322-qr-code-hmed-425p.jpg"
-            />
+            <img width={500} src={imageUrl} alt="qr code" />
             <button className="btn btn-primary mt-5">Download QR Code</button>
           </div>
         </div>

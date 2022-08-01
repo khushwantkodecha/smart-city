@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../css/ManageProfile.css";
+import "../../assets/css/ManageProfile.css";
 import { ToastContainer, toast } from "react-toastify";
 import moment from "moment";
-import Loader from "../components/Loader";
+import Loader from "../../components/loader/Loader";
+import { Typography } from "@mui/material";
 
-function ManageProfile() {
+function ManageProfile({ setisLoggedIn }) {
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
@@ -61,9 +62,12 @@ function ManageProfile() {
           .get("https://pssk-api.azurewebsites.net/User/Nationalities")
           .then((resNat) => {
             setNationnalities(resNat.data);
+            setisLoggedIn(true);
             getUserData();
           })
-          .catch((err) => console.log("nationality api error!"));
+          .catch((err) =>
+            notify("Something went wrong while fetching nationalities!")
+          );
       });
   }, []);
 
@@ -80,12 +84,9 @@ function ManageProfile() {
           const data = {
             ...localUserData,
             userId: response.data.id,
+            qrCode: response.data.qrCode,
           };
           localStorage.setItem("user", JSON.stringify(data));
-          console.log(
-            "fsdfs",
-            moment(response.data.dateOfBirth).format("dd/mm/yyyy")
-          );
           setUserData({
             ...response.data,
             dateOfBirth: moment(response.data.dateOfBirth).format("DD/MM/YYYY"),
@@ -108,8 +109,6 @@ function ManageProfile() {
       [name]: value,
     });
   };
-
-  console.log("data", userData);
 
   const notify = (value) =>
     toast.success(value, {
@@ -141,7 +140,9 @@ function ManageProfile() {
 
   return (
     <>
-      <h3 className="mb-3">Manage Profile</h3>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        Manage Profile
+      </Typography>
       <ToastContainer />
       <div className="mangeprofile">
         {loading ? (
