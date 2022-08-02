@@ -45,10 +45,28 @@ function DigitalKey() {
       ) : (
         <div className="digitalkey w-100">
           <div className="digitalkey_content d-flex flex-column align-items-center">
-            {!qrData?(<Typography variant="body1">Your QR Code Will generate when all the mandatory documents are verified</Typography>):
-            (<><img width={500} src={qrData} alt="qr code" /><Button className="btn btn-primary mt-5">Download QR Code</Button></>)}
-            
-            
+            {!imageUrl ? (
+              <Typography variant="h6" className="mt-3">
+                Your QR Code will be generated when all the mandatory documents
+                are verified
+              </Typography>
+            ) : (
+              <>
+                <img width={500} src={imageUrl} alt="qr code" />
+                <Button
+                  className="mt-5"
+                  variant="contained"
+                  onClick={() => {
+                    let a = document.createElement("a"); //Create <a>
+                    a.href = imageUrl; //Image Base64 Goes here
+                    a.download = "Image.png"; //File name Here
+                    a.click(); //Downloaded file
+                  }}
+                >
+                  Download QR Code As Image
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}

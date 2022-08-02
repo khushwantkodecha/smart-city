@@ -5,8 +5,10 @@ import { ToastContainer, toast } from "react-toastify";
 import moment from "moment";
 import Loader from "../../components/loader/Loader";
 import { Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-function ManageProfile({ setisLoggedIn }) {
+function ManageProfile({ setUserStateChange }) {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
@@ -15,7 +17,7 @@ function ManageProfile({ setisLoggedIn }) {
     nationality: "",
     passportNumber: "",
   });
-  const [userExists, setUserExists] = useState(false);
+  const [userExists, setUserExists] = useState(true);
   const [nationalities, setNationnalities] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +26,7 @@ function ManageProfile({ setisLoggedIn }) {
     const url = window.location.href;
     const urlParams = new URLSearchParams(`?${url.split("#")[1]}`);
     let access_token = urlParams.get("access_token");
-    console.log("i am in manage profile")
+    console.log("i am in manage profile");
     if (!access_token) {
       access_token = JSON.parse(localStorage.getItem("user"))?.access_token;
     }
@@ -35,40 +37,45 @@ function ManageProfile({ setisLoggedIn }) {
         },
       })
       .then((res) => {
-        const data = {
-          access_token,
-          authUserId: res.data.sub,
-          email: res.data.email,
-          email_verified: res.data.email_verified,
-          name: res.data.name,
-        };
-        localStorage.setItem("user", JSON.stringify(data));
+        if (res.data.sub) {
+          const data = {
+            access_token,
+            authUserId: res.data.sub,
+            email: res.data.email,
+            email_verified: res.data.email_verified,
+            name: res.data.name,
+          };
+          localStorage.setItem("user", JSON.stringify(data));
 
-        const nameData = {};
-        const splittedName = res.data.name ? res.data.name.split(" ") : null;
-        if (splittedName) {
-          nameData.firstName = splittedName[0];
-          nameData.lastName =
-            splittedName.length > 0
-              ? splittedName.slice(1, splittedName.length).join(" ")
-              : "";
+          const nameData = {};
+          const splittedName = res.data.name ? res.data.name.split(" ") : null;
+          if (splittedName) {
+            nameData.firstName = splittedName[0];
+            nameData.lastName =
+              splittedName.length > 0
+                ? splittedName.slice(1, splittedName.length).join(" ")
+                : "";
+          }
+
+          setUserData({
+            ...userData,
+            ...nameData,
+            email: res.data.email,
+          });
+          axios
+            .get("https://pssk-api.azurewebsites.net/User/Nationalities")
+            .then((resNat) => {
+              setNationnalities(resNat.data);
+              setUserStateChange(true);
+              getUserData();
+            })
+            .catch((err) =>
+              notify("Something went wrong while fetching nationalities!")
+            );
+        } else {
+          navigate("/");
+          setUserStateChange(false);
         }
-
-        setUserData({
-          ...userData,
-          ...nameData,
-          email: res.data.email,
-        });
-        axios
-          .get("https://pssk-api.azurewebsites.net/User/Nationalities")
-          .then((resNat) => {
-            setNationnalities(resNat.data);
-            setisLoggedIn(true);
-            getUserData();
-          })
-          .catch((err) =>
-            notify("Something went wrong while fetching nationalities!")
-          );
       });
   }, []);
 
@@ -92,6 +99,7 @@ function ManageProfile({ setisLoggedIn }) {
             ...response.data,
             dateOfBirth: moment(response.data.dateOfBirth).format("DD/MM/YYYY"),
           });
+          setUserStateChange(false);
           setUserExists(true);
           setLoading(false);
         }
@@ -103,6 +111,7 @@ function ManageProfile({ setisLoggedIn }) {
         }
       });
   };
+
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
     setUserData({
@@ -112,7 +121,7 @@ function ManageProfile({ setisLoggedIn }) {
   };
 
   const notify = (value) =>
-    toast.success(value, {
+    toast(value, {
       position: "top-right",
       autoClose: 2000,
       hideProgressBar: true,
@@ -142,7 +151,7 @@ function ManageProfile({ setisLoggedIn }) {
   return (
     <>
       <Typography variant="h5" sx={{ mb: 3 }}>
-        Manage Profile
+        {userExists ? "Manage Profile" : "Complete Full Profile"}
       </Typography>
       <ToastContainer />
       <div className="mangeprofile">

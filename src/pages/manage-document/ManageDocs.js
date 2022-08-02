@@ -6,7 +6,7 @@ import Loader from "../../components/loader/Loader";
 import { BsEye } from "react-icons/bs";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import { Button, Typography } from "@mui/material";
@@ -17,6 +17,7 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
+  height: 280,
   bgcolor: "background.paper",
   border: "1px solid rgba(0, 0, 0, 0.0625)",
   boxShadow: 24,
@@ -28,34 +29,39 @@ function ManageDocs() {
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = React.useState(false);
-  const handleClose = () => setOpen(false);
+  const [modalLoading, setModalLoading] = useState(false);
+  const handleClose = () => {
+    setSelDoc(null);
+    setModalLoading(false);
+    setOpen(false);
+  };
   const [selDoc, setSelDoc] = useState(null);
 
   const navigate = useNavigate();
 
   const notify = (value) =>
-    toast.success(value, {
+    toast(value, {
       position: "top-right",
       autoClose: 2000,
       hideProgressBar: true,
       closeOnClick: false,
-      pauseOnHover: true,
+      // pauseOnHover: true,
       draggable: false,
       progress: 0,
     });
-  const getDocs=()=>{
+  const getDocs = () => {
     const userId = JSON.parse(localStorage.getItem("user"))?.userId;
     axios
-        .get(`https://pssk-api.azurewebsites.net/Document?userId=${userId}`)
-        .then((res) => {
-          setDocs(res.data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          setLoading(false);
-          notify("Something went wrong while fetching docs!");
-        });
-  }
+      .get(`https://pssk-api.azurewebsites.net/Document?userId=${userId}`)
+      .then((res) => {
+        setDocs(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        notify("Something went wrong while fetching docs!");
+      });
+  };
   useEffect(() => {
     const userId = JSON.parse(localStorage.getItem("user"))?.userId;
     if (!userId) {
@@ -67,28 +73,31 @@ function ManageDocs() {
       setLoading(true);
       getDocs();
     }
-  }, [navigate]);
+  }, []);
 
-  const getStatusColor=(status)=>{
-    console.log(typeof(status));
+  const getStatusColor = (status) => {
+    console.log(typeof status);
     let color;
-    if(status=='PendingApproval')color='orange';
-    else if(status=='Rejected')color='red';
-    else color='green';
-    return color
-  }
+    if (status == "PendingApproval") color = "orange";
+    else if (status == "Rejected") color = "red";
+    else color = "green";
+    return color;
+  };
 
   const deleteDocument = (item) => {
     const userid = JSON.parse(localStorage.getItem("user"))?.userId;
-    console.log(typeof(item.name))
-    console.log(userid.type)
-    axios.delete(`https://pssk-api.azurewebsites.net/Document/Delete?userId=${userid}&documentName=${item.name}`)
-    .then((res) => {
-        notify(`${item.documentType.type} has been Successfully deleted `)
+    console.log(typeof item.name);
+    console.log(userid.type);
+    axios
+      .delete(
+        `https://pssk-api.azurewebsites.net/Document/Delete?userId=${userid}&documentName=${item.name}`
+      )
+      .then((res) => {
+        notify(`${item.documentType.type} has been Successfully deleted `);
         getDocs();
-    })
-    .catch((err) => console.log('error in deleting :', err))
-}
+      })
+      .catch((err) => console.log("error in deleting :", err));
+  };
 
   return (
     <>
@@ -119,19 +128,28 @@ function ManageDocs() {
                     <td>{i + 1}</td>
                     {/* <td>{item.displayName}</td> */}
                     <td>{item.documentType.type}</td>
-                    <td style={{color: getStatusColor(item.status)}}>{item.status}</td>
+                    <td style={{ color: getStatusColor(item.status) }}>
+                      {item.status}
+                    </td>
                     <td title="view">
                       <BsEye
                         onClick={() => {
-                          const userid = JSON.parse(localStorage.getItem("user"))?.userId;
-                          axios.get(`https://pssk-api.azurewebsites.net/Document/Base64?documentName=${item.name}&userId=${userid}`)
-                          .then((res) => {
-                            console.log('user id is :',userid);
-                            console.log(item)
-                              console.log(res.data)
+                          setModalLoading(true);
+                          const userid = JSON.parse(
+                            localStorage.getItem("user")
+                          )?.userId;
+                          axios
+                            .get(
+                              `https://pssk-api.azurewebsites.net/Document/Base64?documentName=${item.name}&userId=${userid}`
+                            )
+                            .then((res) => {
+                              console.log("user id is :", userid);
+                              console.log(item);
+                              console.log(res.data);
                               setSelDoc(res.data);
-                          })
-                          
+                              setModalLoading(false);
+                            });
+
                           setOpen(true);
                         }}
                       />
@@ -140,8 +158,7 @@ function ManageDocs() {
                       <DeleteIcon
                         onClick={() => {
                           deleteDocument(item);
-                        }
-                      }
+                        }}
                       />
                     </td>
                   </tr>
@@ -167,7 +184,11 @@ function ManageDocs() {
         >
           <Fade in={open}>
             <Box sx={style}>
-              <img width={335} src={selDoc} alt="view doc img" />
+              {modalLoading ? (
+                <Loader />
+              ) : (
+                <img width={335} src={selDoc} alt="view doc img" />
+              )}
             </Box>
           </Fade>
         </Modal>

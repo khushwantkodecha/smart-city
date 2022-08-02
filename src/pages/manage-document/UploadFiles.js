@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "../../assets/css/UploadFiles.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +23,7 @@ function UploadFiles() {
   const navigate = useNavigate();
 
   const notify = (value) =>
-    toast.success(value, {
+    toast(value, {
       position: "top-right",
       autoClose: 2000,
       hideProgressBar: true,
@@ -33,17 +33,14 @@ function UploadFiles() {
       progress: 0,
     });
 
-
-    useEffect(()=>{
-      axios.get(`https://pssk-api.azurewebsites.net/Document/DocumentTypes`)
+  useEffect(() => {
+    axios
+      .get(`https://pssk-api.azurewebsites.net/Document/DocumentTypes`)
       .then((res) => {
-          console.log('document types:',res.data);
-          setApprover(res.data)
-        })
-        
-    },
-    [])
-
+        console.log("document types:", res.data);
+        setApprover(res.data);
+      });
+  }, []);
 
   const handleSubmit = () => {
     setLoading(true);
@@ -94,7 +91,7 @@ function UploadFiles() {
   return (
     <>
       <Typography variant="h5" sx={{ mb: 3 }}>
-       <center> Upload Document</center>
+        <center> Upload Document</center>
       </Typography>
       <ToastContainer />
       {loading ? (
@@ -103,7 +100,7 @@ function UploadFiles() {
         <div className="upload_files">
           <div className="upload_files_content">
             <div>
-            <br/>
+              <br />
               <h6>Select Document Type :</h6>
               <select onChange={(e) => setSelDocId(e.target.value)}>
                 {approver.map((item) => (
@@ -112,7 +109,7 @@ function UploadFiles() {
                   </option>
                 ))}
               </select>
-              
+
               <div className="mt-2">
                 {/* <input type="file"  /> */}
                 <div>

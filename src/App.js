@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/auth/Login";
@@ -20,15 +20,39 @@ import { Button } from "@mui/material";
 
 const App = () => {
   const user = localStorage.getItem("user");
-  const [isLoggedIn, setisLoggedIn] = useState(true);
+  const [isLoggedIn, setisLoggedIn] = useState(
+    localStorage.getItem("user") || false
+  );
+  const [userData, setUserData] = useState(null);
   const [sideOpen, setSideOpen] = useState(true);
+  const [userStateChange, setUserStateChange] = useState(false);
+
+  const loginStateChangeHandler = () => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      setisLoggedIn(true);
+      setUserData(JSON.parse(user));
+    } else {
+      setisLoggedIn(false);
+      setUserData(null);
+    }
+  };
+
+  console.log("userData", userData);
+  useEffect(() => {
+    loginStateChangeHandler();
+  }, []);
+
+  useEffect(() => {
+    loginStateChangeHandler();
+  }, [userStateChange]);
 
   const signoutHandler = () => {
     const href = window.location.origin;
     axios
       .get("https://pssk-api.azurewebsites.net/Authentication/Logout")
       .then((res) => {
-        localStorage.clear();
+        localStorage.removeItem("user");
         setisLoggedIn(false);
         var new_URL = res.data.toString();
         new_URL = new_URL.replace("{RedirectUrl}", "http://localhost:3000");
@@ -58,22 +82,28 @@ const App = () => {
               <h4>Publicis Sapient</h4>
             </div>
             <ul>
-              {MenuItems.map((item) => (
-                <NavLink
-                  key={item.id}
-                  to={`${item.url}`}
-                  style={({ isActive }) =>
-                    isActive
-                      ? {
-                          color: "blue",
-                          textDecoration: "none",
-                        }
-                      : { color: "#000", textDecoration: "none" }
-                  }
-                >
-                  <li>{item.title}</li>
-                </NavLink>
-              ))}
+              {MenuItems.map((item) => {
+                // if (userData?.userId && item.showWithoutProfile) {
+                return (
+                  <NavLink
+                    key={item.id}
+                    to={`${item.url}`}
+                    style={({ isActive }) =>
+                      isActive
+                        ? {
+                            color: "blue",
+                            textDecoration: "none",
+                          }
+                        : { color: "#000", textDecoration: "none" }
+                    }
+                  >
+                    <li>{item.title}</li>
+                  </NavLink>
+                );
+                // } else {
+                //   return;
+                // }
+              })}
               {isLoggedIn ? (
                 <li className="signout_link">
                   <Button onClick={signoutHandler}>Sign Out</Button>
@@ -111,7 +141,9 @@ const App = () => {
 
             {isLoggedIn ? (
               <Stack direction="row" spacing={2}>
-                <Avatar sx={{ mr: 3 }}>{userName?.charAt(0)}</Avatar>
+                <Avatar sx={{ mr: 3 }}>
+                  {userName?.charAt(0).toUpperCase()}
+                </Avatar>
               </Stack>
             ) : (
               <Button sx={{ pr: 2 }} to="/">
@@ -121,13 +153,16 @@ const App = () => {
           </div>
           <div className="main_content">
             <Routes>
-              <Route path="/" element={<Login setisLoggedIn={setisLoggedIn}/>} />
+              <Route
+                path="/"
+                element={<Login setUserStateChange={setUserStateChange} />}
+              />
               <Route
                 path="/Homepage"
                 element={
-                  <Protected isLoggedIn={isLoggedIn}>
-                    <ManageProfile setisLoggedIn={setisLoggedIn} />
-                  </Protected>
+                  // <Protected isLoggedIn={isLoggedIn}>
+                  <ManageProfile setUserStateChange={setUserStateChange} />
+                  // </Protected>
                 }
               />
               <Route

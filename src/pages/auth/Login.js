@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Loader from "../../components/loader/Loader";
 import { Button, Typography } from "@mui/material";
 
-function Login({ setisLoggedIn}) {
+function Login({ setUserStateChange }) {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -27,9 +27,8 @@ function Login({ setisLoggedIn}) {
         var new_URL = res.data.toString();
         new_URL = new_URL.replace("{RedirectUrl}", `${href}Homepage`);
         console.log("new_URL", new_URL);
-        setisLoggedIn(true)
+        setUserStateChange(true);
         window.location = new_URL;
-        
       })
       .catch((err) => {
         setLoading(false);
@@ -38,7 +37,7 @@ function Login({ setisLoggedIn}) {
   };
 
   const notify = (value) =>
-    toast.success(value, {
+    toast(value, {
       position: "top-right",
       autoClose: 2000,
       hideProgressBar: true,
