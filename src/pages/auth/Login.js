@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Loader from "../../components/loader/Loader";
 import { Button, Typography } from "@mui/material";
 
-function Login() {
+function Login({ setisLoggedIn}) {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +27,9 @@ function Login() {
         var new_URL = res.data.toString();
         new_URL = new_URL.replace("{RedirectUrl}", `${href}Homepage`);
         console.log("new_URL", new_URL);
+        setisLoggedIn(true)
         window.location = new_URL;
+        
       })
       .catch((err) => {
         setLoading(false);

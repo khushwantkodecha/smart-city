@@ -121,7 +121,7 @@ const App = () => {
           </div>
           <div className="main_content">
             <Routes>
-              <Route path="/" element={<Login />} />
+              <Route path="/" element={<Login setisLoggedIn={setisLoggedIn}/>} />
               <Route
                 path="/Homepage"
                 element={

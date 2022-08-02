@@ -24,6 +24,7 @@ function ManageProfile({ setisLoggedIn }) {
     const url = window.location.href;
     const urlParams = new URLSearchParams(`?${url.split("#")[1]}`);
     let access_token = urlParams.get("access_token");
+    console.log("i am in manage profile")
     if (!access_token) {
       access_token = JSON.parse(localStorage.getItem("user"))?.access_token;
     }

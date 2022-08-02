@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Loader from "../../components/loader/Loader";
 import { ToastContainer, toast } from "react-toastify";
+import { Button, Typography } from "@mui/material";
 
 function DigitalKey() {
   const [qrData, setQrData] = useState(null);
@@ -19,10 +20,10 @@ function DigitalKey() {
     });
 
   useEffect(() => {
-    const email = JSON.parse(localStorage.getItem("user"))?.email;
+    const userid = JSON.parse(localStorage.getItem("user"))?.userId;
     setLoading(true);
     axios
-      .get(`https://pssk-api.azurewebsites.net/User/${email}/QRCode`)
+      .get(`https://pssk-api.azurewebsites.net/User/${userid}/QRCode`)
       .then((res) => {
         setLoading(false);
         setQrData(res.data);
@@ -44,8 +45,10 @@ function DigitalKey() {
       ) : (
         <div className="digitalkey w-100">
           <div className="digitalkey_content d-flex flex-column align-items-center">
-            <img width={500} src={imageUrl} alt="qr code" />
-            <button className="btn btn-primary mt-5">Download QR Code</button>
+            {!qrData?(<Typography variant="body1">Your QR Code Will generate when all the mandatory documents are verified</Typography>):
+            (<><img width={500} src={qrData} alt="qr code" /><Button className="btn btn-primary mt-5">Download QR Code</Button></>)}
+            
+            
           </div>
         </div>
       )}

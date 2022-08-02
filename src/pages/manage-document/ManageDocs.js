@@ -6,6 +6,7 @@ import Loader from "../../components/loader/Loader";
 import { BsEye } from "react-icons/bs";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
+import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import { Button, Typography } from "@mui/material";
@@ -42,17 +43,9 @@ function ManageDocs() {
       draggable: false,
       progress: 0,
     });
-
-  useEffect(() => {
+  const getDocs=()=>{
     const userId = JSON.parse(localStorage.getItem("user"))?.userId;
-    if (!userId) {
-      notify("Please complete profile!");
-      setTimeout(() => {
-        navigate("/Homepage");
-      }, 2000);
-    } else {
-      setLoading(true);
-      axios
+    axios
         .get(`https://pssk-api.azurewebsites.net/Document?userId=${userId}`)
         .then((res) => {
           setDocs(res.data);
@@ -62,8 +55,40 @@ function ManageDocs() {
           setLoading(false);
           notify("Something went wrong while fetching docs!");
         });
+  }
+  useEffect(() => {
+    const userId = JSON.parse(localStorage.getItem("user"))?.userId;
+    if (!userId) {
+      notify("Please complete profile!");
+      setTimeout(() => {
+        navigate("/Homepage");
+      }, 2000);
+    } else {
+      setLoading(true);
+      getDocs();
     }
   }, [navigate]);
+
+  const getStatusColor=(status)=>{
+    console.log(typeof(status));
+    let color;
+    if(status=='PendingApproval')color='orange';
+    else if(status=='Rejected')color='red';
+    else color='green';
+    return color
+  }
+
+  const deleteDocument = (item) => {
+    const userid = JSON.parse(localStorage.getItem("user"))?.userId;
+    console.log(typeof(item.name))
+    console.log(userid.type)
+    axios.delete(`https://pssk-api.azurewebsites.net/Document/Delete?userId=${userid}&documentName=${item.name}`)
+    .then((res) => {
+        notify(`${item.documentType.type} has been Successfully deleted `)
+        getDocs();
+    })
+    .catch((err) => console.log('error in deleting :', err))
+}
 
   return (
     <>
@@ -81,25 +106,42 @@ function ManageDocs() {
               <thead className="text-center">
                 <tr>
                   <th>#</th>
-                  <th>Name</th>
+                  {/* <th>Name</th> */}
                   <th>Type</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>View</th>
+                  <th>Delete</th>
                 </tr>
               </thead>
               <tbody className="text-center">
                 {docs.map((item, i) => (
                   <tr>
                     <td>{i + 1}</td>
-                    <td>{item.displayName}</td>
+                    {/* <td>{item.displayName}</td> */}
                     <td>{item.documentType.type}</td>
-                    <td>{item.status}</td>
+                    <td style={{color: getStatusColor(item.status)}}>{item.status}</td>
                     <td title="view">
                       <BsEye
                         onClick={() => {
-                          setSelDoc(item);
+                          const userid = JSON.parse(localStorage.getItem("user"))?.userId;
+                          axios.get(`https://pssk-api.azurewebsites.net/Document/Base64?documentName=${item.name}&userId=${userid}`)
+                          .then((res) => {
+                            console.log('user id is :',userid);
+                            console.log(item)
+                              console.log(res.data)
+                              setSelDoc(res.data);
+                          })
+                          
                           setOpen(true);
                         }}
+                      />
+                    </td>
+                    <td title="view">
+                      <DeleteIcon
+                        onClick={() => {
+                          deleteDocument(item);
+                        }
+                      }
                       />
                     </td>
                   </tr>
@@ -109,12 +151,6 @@ function ManageDocs() {
           ) : (
             <div className="text-center">
               <h4 className="mb-4">No Document Found!</h4>
-              <button
-                className="btn btn-primary"
-                onClick={() => navigate("/upload-docs")}
-              >
-                Upload New
-              </button>
             </div>
           )}
         </div>
@@ -131,7 +167,7 @@ function ManageDocs() {
         >
           <Fade in={open}>
             <Box sx={style}>
-              <img width={335} src={selDoc?.document} alt="view doc img" />
+              <img width={335} src={selDoc} alt="view doc img" />
             </Box>
           </Fade>
         </Modal>
