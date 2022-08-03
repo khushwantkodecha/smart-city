@@ -151,7 +151,7 @@ function ManageProfile({ setUserStateChange }) {
   return (
     <>
       <Typography variant="h5" sx={{ mb: 3 }}>
-        {userExists ? "Manage Profile" : "Complete Full Profile"}
+        {userExists ? "Manage Profile" : "Please tell us more about yourself "}
       </Typography>
       <ToastContainer />
       <div className="mangeprofile">
