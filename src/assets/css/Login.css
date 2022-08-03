@@ -26,3 +26,24 @@ input[type=email] {
     box-sizing: border-box;
 } */
 
+.or_container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.5em;
+}
+
+.or_container > *{
+    flex: 0.3;
+}
+
+.loginwith_container{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0.8em 0;
+}
+
+.loginwith_container > * {
+    cursor: pointer;
+}

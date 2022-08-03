@@ -21,6 +21,19 @@ function ManageProfile({ setUserStateChange }) {
   const [nationalities, setNationnalities] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const signoutHandler = () => {
+    const href = window.location.origin;
+    axios
+      .get("https://pssk-api.azurewebsites.net/Authentication/Logout")
+      .then((res) => {
+        localStorage.removeItem("user");
+        setUserStateChange(false);
+        var new_URL = res.data.toString();
+        new_URL = new_URL.replace("{RedirectUrl}", "http://localhost:3000");
+        window.location = new_URL;
+      });
+  };
+
   useEffect(() => {
     setLoading(true);
     const url = window.location.href;
@@ -37,7 +50,7 @@ function ManageProfile({ setUserStateChange }) {
         },
       })
       .then((res) => {
-        if (res.data.sub) {
+        if (res.data.email_verified) {
           const data = {
             access_token,
             authUserId: res.data.sub,
@@ -57,24 +70,28 @@ function ManageProfile({ setUserStateChange }) {
                 : "";
           }
 
-          setUserData({
-            ...userData,
-            ...nameData,
-            email: res.data.email,
-          });
           axios
             .get("https://pssk-api.azurewebsites.net/User/Nationalities")
             .then((resNat) => {
               setNationnalities(resNat.data);
               setUserStateChange(true);
+              setUserData({
+                ...userData,
+                ...nameData,
+                nationality: resNat?.data[0]?.value,
+                email: res.data.email,
+              });
               getUserData();
             })
             .catch((err) =>
               notify("Something went wrong while fetching nationalities!")
             );
         } else {
-          navigate("/");
-          setUserStateChange(false);
+          notify("Email not verified");
+
+          // setTimeout(() => {
+          signoutHandler();
+          // }, 2000);
         }
       });
   }, []);
@@ -142,6 +159,12 @@ function ManageProfile({ setUserStateChange }) {
     axios
       .post("https://pssk-api.azurewebsites.net/User/Create", payload)
       .then(() => {
+        const localUserData = JSON.parse(localStorage.getItem("user"));
+        const data = {
+          ...localUserData,
+          email: userData.email,
+        };
+        localStorage.setItem("user", JSON.stringify(data));
         getUserData();
         notify("User Updated Successfully!");
       })
@@ -150,9 +173,11 @@ function ManageProfile({ setUserStateChange }) {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        {userExists ? "Manage Profile" : "Complete Full Profile"}
-      </Typography>
+      {JSON.parse(localStorage.getItem("user"))?.email_verified && (
+        <Typography variant="h5" sx={{ mb: 3 }}>
+          {userExists ? "Manage Profile" : "Complete Full Profile"}
+        </Typography>
+      )}
       <ToastContainer />
       <div className="mangeprofile">
         {loading ? (
@@ -219,10 +244,15 @@ function ManageProfile({ setUserStateChange }) {
                   <div className="col">
                     <input
                       type="email"
+                      onChange={(e) => onChangeHandler(e)}
                       placeholder="Email"
                       name="email"
                       value={userData.email}
-                      disabled
+                      disabled={
+                        JSON.parse(localStorage.getItem("user"))?.email
+                          ? true
+                          : false
+                      }
                     />
                   </div>
                   <div className="col">

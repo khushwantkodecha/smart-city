@@ -17,6 +17,7 @@ import Avatar from "@mui/material/Avatar";
 
 import MenuItems from "./menu-items/MenuItems";
 import { Button } from "@mui/material";
+import Register from "./pages/auth/Register";
 
 const App = () => {
   const user = localStorage.getItem("user");
@@ -82,8 +83,51 @@ const App = () => {
               <h4>Publicis Sapient</h4>
             </div>
             <ul>
-              {MenuItems.map((item) => {
-                // if (userData?.userId && item.showWithoutProfile) {
+              <NavLink
+                to="/Homepage"
+                style={({ isActive }) =>
+                  isActive
+                    ? {
+                        color: "blue",
+                        textDecoration: "none",
+                      }
+                    : { color: "#000", textDecoration: "none" }
+                }
+              >
+                <li>Manage Profile</li>
+              </NavLink>
+              {userData?.userId && (
+                <>
+                  <NavLink
+                    to="/manage-docs"
+                    style={({ isActive }) =>
+                      isActive
+                        ? {
+                            color: "blue",
+                            textDecoration: "none",
+                          }
+                        : { color: "#000", textDecoration: "none" }
+                    }
+                  >
+                    <li>Manage Documents</li>
+                  </NavLink>
+                  <NavLink
+                    to="/digital-key"
+                    style={({ isActive }) =>
+                      isActive
+                        ? {
+                            color: "blue",
+                            textDecoration: "none",
+                          }
+                        : { color: "#000", textDecoration: "none" }
+                    }
+                  >
+                    <li>Digital Key</li>
+                  </NavLink>
+                </>
+              )}
+
+              {/* {MenuItems.map((item) => {
                 return (
                   <NavLink
                     key={item.id}
@@ -100,10 +144,8 @@ const App = () => {
                     <li>{item.title}</li>
                   </NavLink>
                 );
-                // } else {
-                //   return;
-                // }
-              })}
+                
+              })} */}
               {isLoggedIn ? (
                 <li className="signout_link">
                   <Button onClick={signoutHandler}>Sign Out</Button>
@@ -157,6 +199,7 @@ const App = () => {
                 path="/"
                 element={<Login setUserStateChange={setUserStateChange} />}
               />
+              <Route path="/sign-up" element={<Register />} />
               <Route
                 path="/Homepage"
                 element={
