@@ -175,7 +175,7 @@ function ManageProfile({ setUserStateChange }) {
     <>
       {JSON.parse(localStorage.getItem("user"))?.email_verified && (
         <Typography variant="h5" sx={{ mb: 3 }}>
-          {userExists ? "Manage Profile" : "Complete Full Profile"}
+          {userExists ? "Manage Profile" : "Please tell us more about yourself"}
         </Typography>
       )}
       <ToastContainer />

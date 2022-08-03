@@ -36,9 +36,7 @@ function ManageDocs() {
     setOpen(false);
   };
   const [selDoc, setSelDoc] = useState(null);
-
   const navigate = useNavigate();
-
   const notify = (value) =>
     toast(value, {
       position: "top-right",
@@ -102,9 +100,11 @@ function ManageDocs() {
   return (
     <>
       <div className="d-flex align-items-center justify-content-between mb-5">
-        <Typography variant="h5">Manage Document</Typography>
-        <Button onClick={() => navigate("/upload-docs")}>Upload New</Button>
+        <Typography variant="h5">Manage your Documents</Typography>
+       
       </div>
+      
+      <h6>National ID and Travel Documents are mandatory to upload.</h6>
       <div className="manage_docs">
         <ToastContainer />
         <div className="manage_docs_content">
@@ -170,6 +170,7 @@ function ManageDocs() {
               <h4 className="mb-4">No Document Found!</h4>
             </div>
           )}
+          <center><Button  onClick={() => navigate("/upload-docs")}>Upload New</Button></center>
         </div>
         <Modal
           aria-labelledby="transition-modal-title"

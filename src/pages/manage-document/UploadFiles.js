@@ -91,7 +91,7 @@ function UploadFiles() {
   return (
     <>
       <Typography variant="h5" sx={{ mb: 3 }}>
-        <center> Upload Document</center>
+        <center> Upload your Documents </center>
       </Typography>
       <ToastContainer />
       {loading ? (
@@ -102,6 +102,7 @@ function UploadFiles() {
             <div>
               <br />
               <h6>Select Document Type :</h6>
+              
               <select onChange={(e) => setSelDocId(e.target.value)}>
                 {approver.map((item) => (
                   <option key={item.id} value={item.id}>
@@ -109,23 +110,27 @@ function UploadFiles() {
                   </option>
                 ))}
               </select>
-
+             
               <div className="mt-2">
                 {/* <input type="file"  /> */}
                 <div>
                   <input
                     className="form-control"
                     type="file"
+                    accept="image/jpg,image/jpeg,application/pdf" 
                     onChange={(e) => handleFileSelect(e)}
                   />
                 </div>
               </div>
+              <br></br>
+              <h6>National ID and Travel Documents are mandatory.</h6>
               <button
                 className="btn btn-primary w-100 mt-4"
                 onClick={handleSubmit}
               >
                 Upload
               </button>
+             
             </div>
           </div>
         </div>
