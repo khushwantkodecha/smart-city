@@ -35,6 +35,7 @@ function ManageDocs() {
     setModalLoading(false);
     setOpen(false);
   };
+
   const [selDoc, setSelDoc] = useState(null);
   const navigate = useNavigate();
   const notify = (value) =>
@@ -72,6 +73,7 @@ function ManageDocs() {
       getDocs();
     }
   }, []);
+
 
   const getStatusColor = (status) => {
     console.log(typeof status);
